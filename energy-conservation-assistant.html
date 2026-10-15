@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoWise — Energy Conservation Assistant</title>
+  <style>
+    :root { --ink:#14352b; --muted:#60756d; --green:#18794e; --lime:#dff5d4; --cream:#f7f8f2; --line:#d8e2da; --white:#fff; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--ink); background:linear-gradient(135deg,#eef7eb 0%,#f7f8f2 45%,#e8f4ed 100%); }
+    .shell { max-width:1050px; min-height:100vh; margin:auto; padding:24px; display:grid; grid-template-columns:280px 1fr; gap:22px; }
+    .sidebar,.chat { background:rgba(255,255,255,.9); border:1px solid var(--line); border-radius:22px; box-shadow:0 12px 35px rgba(28,75,50,.08); }
+    .sidebar { padding:26px 22px; display:flex; flex-direction:column; }
+    .brand { display:flex; align-items:center; gap:11px; font-weight:760; font-size:21px; letter-spacing:-.5px; }
+    .leaf { width:38px; height:38px; display:grid; place-items:center; border-radius:12px; background:var(--green); color:white; font-size:22px; }
+    .intro { color:var(--muted); line-height:1.5; font-size:14px; margin:24px 0 20px; }
+    .label { text-transform:uppercase; letter-spacing:1.1px; font-weight:700; font-size:11px; color:var(--muted); margin-bottom:10px; }
+    .suggestions { display:grid; gap:8px; }
+    button { font:inherit; cursor:pointer; }
+    .chip { text-align:left; color:var(--ink); background:#f3f8f3; border:1px solid transparent; padding:10px 11px; border-radius:10px; font-size:13px; transition:.15s; }
+    .chip:hover { border-color:#9bcbb0; background:var(--lime); }
+    .tip { margin-top:auto; background:var(--lime); border-radius:16px; padding:15px; font-size:13px; line-height:1.45; }
+    .tip strong { display:block; margin-bottom:4px; }
+    .chat { display:flex; flex-direction:column; min-height:650px; overflow:hidden; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; padding:22px 24px 17px; border-bottom:1px solid var(--line); }
+    .title h1 { margin:0; font-size:19px; letter-spacing:-.3px; }
+    .status { color:var(--green); font-size:12px; margin-top:4px; }.dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--green); margin-right:5px; }
+    .clear { padding:8px 11px; border:1px solid var(--line); border-radius:9px; color:var(--muted); background:var(--white); font-size:12px; }
+    .messages { flex:1; padding:24px; overflow:auto; display:flex; flex-direction:column; gap:16px; }
+    .message { display:flex; gap:9px; max-width:82%; line-height:1.5; font-size:14px; }
+    .message.user { align-self:flex-end; flex-direction:row-reverse; }.message.user .bubble { background:var(--green); color:white; border-radius:16px 4px 16px 16px; }
+    .avatar { width:29px; height:29px; flex:0 0 29px; display:grid; place-items:center; border-radius:50%; background:var(--lime); font-size:15px; }.user .avatar { background:#dcefe3; }
+    .bubble { background:#f1f6f1; padding:12px 14px; border-radius:4px 16px 16px 16px; }.bubble p { margin:0; }.bubble p+p { margin-top:7px; }
+    .quick { padding:0 24px 14px; display:flex; flex-wrap:wrap; gap:7px; }.quick button { border:1px solid #b9d6bf; color:#216642; background:white; border-radius:999px; padding:7px 10px; font-size:12px; }
+    form { display:flex; gap:10px; padding:15px 20px 20px; border-top:1px solid var(--line); } input { min-width:0; flex:1; padding:13px 14px; border:1px solid var(--line); border-radius:11px; color:var(--ink); font:inherit; outline:none; } input:focus { border-color:var(--green); box-shadow:0 0 0 3px rgba(24,121,78,.12); } .send { border:0; border-radius:11px; padding:0 16px; background:var(--green); color:#fff; font-weight:700; }
+    @media(max-width:720px){.shell{grid-template-columns:1fr;padding:12px}.sidebar{display:none}.chat{min-height:calc(100vh - 24px);border-radius:16px}.message{max-width:91%}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="leaf">♧</span> EcoWise</div>
+      <p class="intro">Your friendly guide to using less energy, lowering bills, and building better habits.</p>
+      <div class="label">Try asking</div>
+      <div class="suggestions">
+        <button class="chip">How can I reduce my electricity bill?</button>
+        <button class="chip">Which appliances use the most power?</button>
+        <button class="chip">Give me a 7-day energy challenge</button>
+        <button class="chip">What is a star-rated appliance?</button>
+      </div>
+      <div class="tip"><strong>Today’s small win</strong>Switch off power strips overnight to avoid standby consumption.</div>
+    </aside>
+    <section class="chat" aria-label="EcoWise chat assistant">
+      <header class="topbar"><div class="title"><h1>Energy Conservation Assistant</h1><div class="status"><span class="dot"></span>Ready to help</div></div><button class="clear" id="clear">Clear chat</button></header>
+      <div class="messages" id="messages" aria-live="polite">
+        <div class="message"><div class="avatar">🌿</div><div class="bubble"><p>Hi! I’m EcoWise. Ask me for practical ways to save electricity at home, understand an appliance’s energy use, or build an energy-saving routine.</p></div></div>
+      </div>
+      <div class="quick"><button>Save energy today</button><button>AC efficiency tips</button><button>Estimate appliance cost</button></div>
+      <form id="form"><input id="input" aria-label="Your message" autocomplete="off" placeholder="Ask about saving energy…" /><button class="send" type="submit">Send</button></form>
+    </section>
+  </main>
+  <script>
+    const messages=document.getElementById('messages'), input=document.getElementById('input');
+    const replyFor=q=>{const s=q.toLowerCase();
+      if(/cost|estimate|bill|rupee|unit/.test(s)) return 'To estimate an appliance’s monthly cost: watts ÷ 1,000 × hours used per day × 30 × your electricity tariff. For example, a 75 W fan used 10 hours/day uses about 22.5 kWh per month. At ₹8 per unit, that is roughly ₹180.';
+      if(/ac|air.?condition/.test(s)) return 'For efficient cooling, set the AC to 24–26°C, clean filters monthly, close doors and curtains, and use a ceiling fan to circulate cool air. Each degree lower can noticeably increase energy use.';
+      if(/star|rated|appliance/.test(s)) return 'Higher star-rated appliances are designed to provide the same service with less electricity. Compare the energy label’s annual consumption, not only the purchase price—an efficient refrigerator or AC can repay its higher upfront cost over time.';
+      if(/challenge|7.?day|week/.test(s)) return 'Try this 7-day challenge: Day 1 unplug standby devices; Day 2 replace one frequently used bulb with LED; Day 3 use natural light; Day 4 set AC to 25°C; Day 5 wash full laundry loads; Day 6 track meter readings; Day 7 choose one habit to keep.';
+      if(/most|high|use|power|electricity/.test(s)) return 'The biggest users are usually air conditioners, water heaters/geysers, refrigerators, electric cooking appliances, pumps, and clothes dryers. Focus first on appliances that heat, cool, or run for many hours.';
+      return 'A great place to start is with daily habits: turn devices fully off, use LEDs, run full loads in washing machines, keep refrigerator seals clean, and set cooling appliances moderately. What appliance or room would you like to improve?';};
+    function add(text,user=false){const row=document.createElement('div');row.className='message '+(user?'user':'');row.innerHTML='<div class="avatar">'+(user?'◉':'🌿')+'</div><div class="bubble"><p></p></div>';row.querySelector('p').textContent=text;messages.appendChild(row);messages.scrollTop=messages.scrollHeight;}
+    function ask(q){if(!q.trim())return;add(q,true);input.value='';setTimeout(()=>add(replyFor(q)),280)}
+    document.getElementById('form').addEventListener('submit',e=>{e.preventDefault();ask(input.value)});
+    document.querySelectorAll('.chip,.quick button').forEach(b=>b.addEventListener('click',()=>ask(b.textContent)));
+    document.getElementById('clear').addEventListener('click',()=>{messages.innerHTML='';add('Chat cleared. What energy-saving goal can I help with?')});
+  </script>
+</body>
+</html>
